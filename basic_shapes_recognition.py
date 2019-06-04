@@ -1,4 +1,3 @@
-#prepoznavanje crvene kutije
 import cv2
 import numpy as np
 from math import sqrt
@@ -16,16 +15,7 @@ def jednake_stranice(str1,str2):
         return 1
 
 COLORS_NUM=5
-"""
-lower_red = np.array([160, 80, 50])
-high_red = np.array([180, 255, 255])
-lower_green = np.array([50, 50, 100])
-high_green = np.array([90, 255, 255])
-lower_blue = np.array([100, 80, 50])
-high_blue = np.array([150, 255, 255])
-lower_yellow = np.array([50, 80, 50])
-high_yellow = np.array([70, 255, 255])
-"""
+
 lower_red = np.array([160, 80, 50])
 high_red = np.array([180, 255, 255])
 lower_green = np.array([50, 50, 100])
