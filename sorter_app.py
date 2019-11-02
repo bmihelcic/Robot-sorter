@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 from tkinter import *
 from tkinter import messagebox
-import os
 
+''' global settings '''
 DASH_COUNT=25
 
 RB_WIDTH=6
@@ -14,24 +14,24 @@ TOG_WIDTH=8
 TERMINAL_X=40
 TERMINAL_Y=20
 
+
+
 ''' root frame '''
 main_frame=Tk()
-
 
 oblikA=IntVar()
 bojaA=IntVar()
 masaA_min=IntVar()
 masaA_max=IntVar()
-
 oblikB=IntVar()
 bojaB=IntVar()
 masaB_min=IntVar()
 masaB_max=IntVar()
-
 oblikC=IntVar()
 bojaC=IntVar()
 masaC_min=IntVar()
 masaC_max=IntVar()
+
 message_list=['A',0,0,0,0,0,0,0,0,0,'B',0,0,0,0,0,0,0,0,0,'C',0,0,0,0,0,0,0,0,0,'#']
 
 ''' unosenje znamenki MIN mase u uart poruku (za sve spremnike)'''
@@ -122,7 +122,7 @@ def send():
         message = ''.join(str(e) for e in message_list)
         terminal.insert(END,message+'\n')
         terminal.see('end')
-        print(message)
+        #print(message)
     except ValueError:
         messagebox.showwarning("Warning!","Molim ispravan unos mase (0-1000 grama)")
 
