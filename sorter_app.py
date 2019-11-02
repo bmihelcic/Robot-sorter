@@ -32,7 +32,7 @@ oblikC=IntVar()
 bojaC=IntVar()
 masaC_min=IntVar()
 masaC_max=IntVar()
-message_list=['A',0,0,0,0,0,0,0,0,0,0,0,'B',0,0,0,0,0,0,0,0,0,0,0,'C',0,0,0,0,0,0,0,0,0,0,0,'#']
+message_list=['A',0,0,0,0,0,0,0,0,0,'B',0,0,0,0,0,0,0,0,0,'C',0,0,0,0,0,0,0,0,0,'#']
 
 ''' unosenje znamenki MIN mase u uart poruku (za sve spremnike)'''
 def min_masa_digits():
@@ -44,9 +44,9 @@ def min_masa_digits():
             ostatak = choice % 10
             temp[2 - i] = ostatak
             choice = int(choice / 10)
-        message_list[5+c*12] = temp[0]
-        message_list[6+c*12] = temp[1]
-        message_list[7+c*12] = temp[2]
+        message_list[3+c*10] = temp[0]
+        message_list[4+c*10] = temp[1]
+        message_list[5+c*10] = temp[2]
 
 ''' unosenje znamenki MAX mase u uart poruku (za sve spremnike)'''
 def max_masa_digits():
@@ -58,19 +58,19 @@ def max_masa_digits():
             ostatak = choice % 10
             temp[3 - i] = ostatak
             choice = int(choice / 10)
-        message_list[8+c*12] = temp[0]
-        message_list[9+c*12] = temp[1]
-        message_list[10+c*12] = temp[2]
-        message_list[11+c*12] = temp[3]
+        message_list[6+c*10] = temp[0]
+        message_list[7+c*10] = temp[1]
+        message_list[8+c*10] = temp[2]
+        message_list[9+c*10] = temp[3]
 
 ''' pregled spremnika A i upozoravanje po potrebi '''
 def check_spremnikA():
     if bojaA.get()==0 and oblikA.get()==0 and toggle_btn_masaA['text']=='OFF':
-        for i in range(1,12):
+        for i in range(1,10):
             message_list[i]=0
     else:
+        message_list[1] = oblikA.get()
         message_list[2] = bojaA.get()
-        message_list[3] = oblikA.get()
         if toggle_btn_masaA['text']=='ON':
             if len(entry_masaA_min.get())== 0 or len(entry_masaA_max.get())==0:
                 raise ValueError
@@ -78,17 +78,15 @@ def check_spremnikA():
             masaA_max.set(int(entry_masaA_max.get()))
             if masaA_max.get() < masaA_min.get() or masaA_max.get() > 1000 or masaA_min.get() < 0:
                 raise ValueError
-            message_list[4] = 1
-        message_list[1] = 1
 
 ''' pregled spremnika B i upozoravanje po potrebi '''
 def check_spremnikB():
     if bojaB.get()==0 and oblikB.get()==0 and toggle_btn_masaB['text']=='OFF':
-        for i in range(13,24):
+        for i in range(11,20):
             message_list[i]=0
     else:
-        message_list[14] = bojaB.get()
-        message_list[15] = oblikB.get()
+        message_list[11] = oblikB.get()
+        message_list[12] = bojaB.get()
         if toggle_btn_masaB['text']=='ON':
             if len(entry_masaB_min.get())== 0 or len(entry_masaB_max.get())==0:
                 raise ValueError
@@ -96,17 +94,15 @@ def check_spremnikB():
             masaB_max.set(int(entry_masaB_max.get()))
             if masaB_max.get() < masaB_min.get() or masaB_max.get() > 1000 or masaB_min.get() < 0:
                 raise ValueError
-            message_list[16] = 1
-        message_list[13] = 1
 
 ''' pregled spremnika C i upozoravanje po potrebi '''
 def check_spremnikC():
     if bojaC.get()==0 and oblikC.get()==0 and toggle_btn_masaC['text']=='OFF':
-        for i in range(25,36):
+        for i in range(21,30):
             message_list[i]=0
     else:
-        message_list[26] = bojaC.get()
-        message_list[27] = oblikC.get()
+        message_list[21] = oblikC.get()
+        message_list[22] = bojaC.get()
         if toggle_btn_masaC['text']=='ON':
             if len(entry_masaC_min.get())== 0 or len(entry_masaC_max.get())==0:
                 raise ValueError
@@ -114,8 +110,6 @@ def check_spremnikC():
             masaC_max.set(int(entry_masaC_max.get()))
             if masaC_max.get() < masaC_min.get() or masaC_max.get() > 1000 or masaC_min.get() < 0:
                 raise ValueError
-            message_list[28] = 1
-        message_list[25] = 1
 
 
 def send():
@@ -141,7 +135,7 @@ def toggle_oblikA(state=[False]):
         radio_btn_kuglaA.config(state=NORMAL)
         radio_btn_kockaA.config(state=NORMAL)
         radio_btn_piramidaA.config(state=NORMAL)
-        radio_btn_kockaA.select()
+        radio_btn_kuglaA.select()
     elif state[0]==False:
         toggle_btn_oblikA.config(bg='red')
         toggle_btn_oblikA.config(text='OFF')
@@ -158,7 +152,7 @@ def toggle_bojaA(state=[False]):
         radio_btn_plavaA.config(state=NORMAL)
         radio_btn_zelenaA.config(state=NORMAL)
         radio_btn_zutaA.config(state=NORMAL)
-        radio_btn_crvenaA.select()
+        radio_btn_zelenaA.select()
     elif state[0]==False:
         toggle_btn_bojaA.config(bg='red')
         toggle_btn_bojaA.config(text='OFF')
@@ -191,7 +185,6 @@ def toggle_masaA(state=[False]):
         label_masaA_max.config(fg='grey')
         masaA_min.set(0)
         masaA_max.set(0)
-        message_list[4] = 0
         min_masa_digits()
         max_masa_digits()
 
@@ -204,7 +197,7 @@ def toggle_oblikB(state=[False]):
         radio_btn_kuglaB.config(state=NORMAL)
         radio_btn_kockaB.config(state=NORMAL)
         radio_btn_piramidaB.config(state=NORMAL)
-        radio_btn_kockaB.select()
+        radio_btn_kuglaB.select()
     elif state[0]==False:
         toggle_btn_oblikB.config(bg='red')
         toggle_btn_oblikB.config(text='OFF')
@@ -221,7 +214,7 @@ def toggle_bojaB(state=[False]):
         radio_btn_plavaB.config(state=NORMAL)
         radio_btn_zelenaB.config(state=NORMAL)
         radio_btn_zutaB.config(state=NORMAL)
-        radio_btn_crvenaB.select()
+        radio_btn_zelenaB.select()
     elif state[0]==False:
         toggle_btn_bojaB.config(bg='red')
         toggle_btn_bojaB.config(text='OFF')
@@ -254,7 +247,6 @@ def toggle_masaB(state=[False]):
         label_masaB_max.config(fg='grey')
         masaB_min.set(0)
         masaB_max.set(0)
-        message_list[16] = 0
 
 ''' toggle funkcije za C widgete '''
 def toggle_oblikC(state=[False]):
@@ -265,7 +257,7 @@ def toggle_oblikC(state=[False]):
         radio_btn_kuglaC.config(state=NORMAL)
         radio_btn_kockaC.config(state=NORMAL)
         radio_btn_piramidaC.config(state=NORMAL)
-        radio_btn_kockaC.select()
+        radio_btn_kuglaC.select()
     elif state[0]==False:
         toggle_btn_oblikC.config(bg='red')
         toggle_btn_oblikC.config(text='OFF')
@@ -282,7 +274,7 @@ def toggle_bojaC(state=[False]):
         radio_btn_plavaC.config(state=NORMAL)
         radio_btn_zelenaC.config(state=NORMAL)
         radio_btn_zutaC.config(state=NORMAL)
-        radio_btn_crvenaC.select()
+        radio_btn_zelenaC.select()
     elif state[0]==False:
         toggle_btn_bojaC.config(bg='red')
         toggle_btn_bojaC.config(text='OFF')
@@ -315,7 +307,6 @@ def toggle_masaC(state=[False]):
         label_masaC_max.config(fg='grey')
         masaC_min.set(0)
         masaC_max.set(0)
-        message_list[28] = 0
 
 top_frame=Frame(main_frame)
 frame_A=Frame(top_frame)
