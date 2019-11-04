@@ -7,6 +7,7 @@ opencv-python 4.1.1.26
 Pillow 6.2.1
 '''
 from tkinter import *
+from tkinter import messagebox
 import cv2
 from PIL import Image,ImageTk
 
@@ -79,18 +80,31 @@ class App:
 
     def Send(self):
         try:
-            self.check_containters()
-            self.min_masa_digits()
-            self.max_masa_digits()
-            message = ''.join(str(e) for e in self.message_list)
-            self.terminal.insert(END, message + '\n')
+            self.Prepare_Message()
+            self.message = ''.join(str(e) for e in self.message_list)
+            self.terminal.insert(END, self.message + '\n')
             self.terminal.see('end')
             # print(message)
         except ValueError:
-            self.messagebox.showwarning("Warning!", "Molim ispravan unos mase (0-1000 grama)")
+            messagebox.showwarning("Warning!", "Molim ispravan unos mase (0-1000 grama)")
 
-    ''' unosenje znamenki MIN mase u uart poruku (za sve spremnike)'''
-    def min_masa_digits(self):
+    def Prepare_Message(self):
+        self.spremnici = [self.spremnik_A,self.spremnik_B,self.spremnik_C]
+        for spremnik in self.spremnici:
+            if spremnik.boja.get() == 0 and spremnik.oblik.get() == 0 and spremnik.toggle_btn_masa['text'] == 'OFF':
+                for i in range(1+10*self.spremnici.index(spremnik), 10+10*self.spremnici.index(spremnik)):
+                    self.message_list[i] = 0
+            else:
+                self.message_list[1+10*self.spremnici.index(spremnik)] = spremnik.oblik.get()
+                self.message_list[2+10*self.spremnici.index(spremnik)] = spremnik.boja.get()
+                if spremnik.toggle_btn_masa['text'] == 'ON':
+                    if len(spremnik.entry_masa_min.get()) == 0 or len(spremnik.entry_masa_max.get()) == 0:
+                        raise ValueError
+                    spremnik.masa_min.set(int(spremnik.entry_masa_min.get()))
+                    spremnik.masa_max.set(int(spremnik.entry_masa_max.get()))
+                    if spremnik.masa_max.get() < spremnik.masa_min.get() or spremnik.masa_max.get() > 1000 or spremnik.masa_min.get() < 0:
+                        raise ValueError
+        ''' min masa '''
         temp = [0, 0, 0]
         list_min = [self.spremnik_A.masa_min.get(), self.spremnik_B.masa_min.get(), self.spremnik_C.masa_min.get()]
         for c in range(0, 3):
@@ -102,9 +116,7 @@ class App:
             self.message_list[3 + c * 10] = temp[0]
             self.message_list[4 + c * 10] = temp[1]
             self.message_list[5 + c * 10] = temp[2]
-
-    ''' unosenje znamenki MAX mase u uart poruku (za sve spremnike)'''
-    def max_masa_digits(self):
+        ''' max masa '''
         temp = [0, 0, 0, 0]
         list_max = [self.spremnik_A.masa_max.get(), self.spremnik_B.masa_max.get(), self.spremnik_C.masa_max.get()]
         for c in range(0, 3):
@@ -117,49 +129,6 @@ class App:
             self.message_list[7 + c * 10] = temp[1]
             self.message_list[8 + c * 10] = temp[2]
             self.message_list[9 + c * 10] = temp[3]
-
-    def check_containters(self):
-        if self.spremnik_A.boja.get() == 0 and self.spremnik_A.oblik.get() == 0 and self.spremnik_A.toggle_btn_masa['text'] == 'OFF':
-            for i in range(1, 10):
-                self.message_list[i] = 0
-        else:
-            self.message_list[1] = self.spremnik_A.oblik.get()
-            self.message_list[2] = self.spremnik_A.boja.get()
-            if self.spremnik_A.toggle_btn_masa['text'] == 'ON':
-                if len(self.spremnik_A.entry_masa_min.get()) == 0 or len(self.spremnik_A.entry_masa_max.get()) == 0:
-                    raise ValueError
-                self.spremnik_A.masa_min.set(int(self.spremnik_A.entry_masa_min.get()))
-                self.spremnik_A.masa_max.set(int(self.spremnik_A.entry_masa_max.get()))
-                if self.spremnik_A.masa_max.get() < self.spremnik_A.masa_min.get() or self.spremnik_A.masa_max.get() > 1000 or self.spremnik_A.masa_min.get() < 0:
-                    raise ValueError
-
-        if self.spremnik_B.boja.get() == 0 and self.spremnik_B.oblik.get() == 0 and self.spremnik_B.toggle_btn_masa['text'] == 'OFF':
-            for i in range(11, 20):
-                self.message_list[i] = 0
-        else:
-            self.message_list[11] = self.spremnik_B.oblik.get()
-            self.message_list[12] = self.spremnik_B.boja.get()
-            if self.spremnik_B.toggle_btn_masa['text'] == 'ON':
-                if len(self.spremnik_B.entry_masa_min.get()) == 0 or len(self.spremnik_B.entry_masa_max.get()) == 0:
-                    raise ValueError
-                self.spremnik_B.masa_min.set(int(self.spremnik_B.entry_masa_min.get()))
-                self.spremnik_B.masa_max.set(int(self.spremnik_B.entry_masa_max.get()))
-                if self.spremnik_B.masa_max.get() < self.spremnik_B.masa_min.get() or self.spremnik_B.masa_max.get() > 1000 or self.spremnik_B.masa_min.get() < 0:
-                    raise ValueError
-
-        if self.spremnik_C.boja.get() == 0 and self.spremnik_C.oblik.get() == 0 and self.spremnik_C.toggle_btn_masa['text'] == 'OFF':
-            for i in range(21, 30):
-                self.message_list[i] = 0
-        else:
-            self.message_list[21] = self.spremnik_C.oblik.get()
-            self.message_list[22] = self.spremnik_C.boja.get()
-            if self.spremnik_C.toggle_btn_masa['text'] == 'ON':
-                if len(self.spremnik_C.entry_masa_min.get()) == 0 or len(self.spremnik_C.entry_masa_max.get()) == 0:
-                    raise ValueError
-                self.spremnik_C.masa_min.set(int(self.spremnik_C.entry_masa_min.get()))
-                self.spremnik_C.masa_max.set(int(self.spremnik_C.entry_masa_max.get()))
-                if self.spremnik_C.masa_max.get() < self.spremnik_C.masa_min.get() or self.spremnik_C.masa_max.get() > 1000 or self.spremnik_C.masa_min.get() < 0:
-                    raise ValueError
 
 
 class VideoCapture:
