@@ -1,3 +1,11 @@
+'''
+created by Branimir Mihelcic, 2019
+pip 10.0.1
+setuptools 39.1.0
+numpy 1.17.3
+opencv-python 4.1.1.26
+Pillow 6.2.1
+'''
 from tkinter import *
 import cv2
 from PIL import Image,ImageTk
