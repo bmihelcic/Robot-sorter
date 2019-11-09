@@ -38,9 +38,8 @@ class App:
         self.sub_frame_C = Frame(self.top_frame)
         self.bottom_frame = Frame(root)
 
-        self.video_source = 0
         # open video source
-        self.vid = VideoCapture(self.video_source)
+        self.Video = VideoCapture(0)
 
         self.label_A = Label(self.top_frame, text=DASH_COUNT * "-" + " Spremnik A " + DASH_COUNT * "-", bd=2, relief="solid", fg='white', bg='grey').grid(row=0,column=0)
         self.label_B = Label(self.top_frame, text=DASH_COUNT * '-' + " Spremnik B " + DASH_COUNT * "-", bd=2, relief="solid", fg='white', bg='grey').grid(row=0,column=1)
@@ -49,7 +48,7 @@ class App:
         self.spremnik_B = Spremnik(self.sub_frame_B)
         self.spremnik_C = Spremnik(self.sub_frame_C)
         # Create a canvas that can fit the above video source size
-        self.canvas = Canvas(self.bottom_frame, width=self.vid.width, height=self.vid.height)
+        self.canvas = Canvas(self.bottom_frame, width=self.Video.width, height=self.Video.height)
         self.terminal = Text(self.bottom_frame, height=TERMINAL_Y, width=TERMINAL_X)
         self.terminal_scrollbar = Scrollbar(self.bottom_frame, command=self.terminal.yview)
         self.terminal.config(yscrollcommand=self.terminal_scrollbar.set)
@@ -67,12 +66,12 @@ class App:
         Label(self.root, text=270 * '-').pack()
         self.bottom_frame.pack()
 
-        self.delay = 15
+        self.delay = 4
         self.update()
         self.root.mainloop()
 
     def update(self):
-        ret, frame = self.vid.get_frame()
+        ret, frame = self.Video.get_frame()
         if ret:
             self.photo = ImageTk.PhotoImage(image=Image.fromarray(frame))
             self.canvas.create_image(0, 0, image=self.photo, anchor=NW)
@@ -134,29 +133,30 @@ class App:
 class VideoCapture:
      def __init__(self, video_source):
          # Open the video source
-         self.vid = cv2.VideoCapture(video_source)
-         if not self.vid.isOpened():
+         self.video = cv2.VideoCapture(video_source)
+         if not self.video.isOpened():
              raise ValueError("Unable to open video source", video_source)
-
          # Get video source width and height
-         self.width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)*VID_SCALE_FACTOR
-         self.height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)*VID_SCALE_FACTOR
+         self.width = self.video.get(cv2.CAP_PROP_FRAME_WIDTH)*VID_SCALE_FACTOR
+         self.height = self.video.get(cv2.CAP_PROP_FRAME_HEIGHT)*VID_SCALE_FACTOR
+         self.ret = 0
+
+     def get_frame(self):
+         if self.video.isOpened():
+             self.ret, self.frame = self.video.read()
+             if self.ret:
+                 self.frame = cv2.resize(self.frame, (int(self.width), int(self.height)), interpolation=cv2.INTER_AREA)
+                 self.frame = cv2.flip(self.frame, 1)
+                 return (self.ret, cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB))
+             else:
+                 return (self.ret, None)
+         else:
+             return (self.ret, None)
 
      # Release the video source when the object is destroyed
      def __del__(self):
-         if self.vid.isOpened():
-             self.vid.release()
-
-     def get_frame(self):
-         if self.vid.isOpened():
-             ret, frame = self.vid.read()
-             if ret:
-                 # Return a boolean success flag and the current frame converted to BGR
-                 return (ret, cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-             else:
-                 return (ret, None)
-         else:
-             return (ret, None)
+        if self.video.isOpened():
+            self.video.release()
 
 ''' klasa za spremnike, toggle buttons, radio buttons, etc. '''
 class Spremnik:
