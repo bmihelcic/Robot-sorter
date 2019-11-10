@@ -12,10 +12,7 @@ from PIL import Image,ImageTk
 from Spremnik import Spremnik
 from VideoCapture import VideoCapture
 
-
 DASH_COUNT=25
-TERMINAL_X=40
-TERMINAL_Y=20
 
 ''' main class, the whole application '''
 class App:
@@ -42,7 +39,7 @@ class App:
         self.spremnik_C = Spremnik(self.sub_frame_C)
         # Create a canvas that can fit the above video source size
         self.canvas = Canvas(self.bottom_frame, width=self.Video.width, height=self.Video.height)
-        self.terminal = Text(self.bottom_frame, height=TERMINAL_Y, width=TERMINAL_X)
+        self.terminal = Text(self.bottom_frame, height=20, width=40)
         self.terminal_scrollbar = Scrollbar(self.bottom_frame, command=self.terminal.yview)
         self.terminal.config(yscrollcommand=self.terminal_scrollbar.set)
         self.send_btn = Button(self.bottom_frame, text="SEND", command=self.Send, width=8)
