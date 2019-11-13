@@ -1,5 +1,6 @@
 from tkinter import Label,Button,Radiobutton,Entry,IntVar
 from tkinter.constants import *
+from NumPad import NumPad
 
 RB_WIDTH=6
 RB_HEIGHT=1
@@ -8,7 +9,8 @@ TOG_WIDTH=8
 
 ''' klasa za spremnike, toggle buttons, radio buttons, etc. '''
 class Spremnik:
-    def __init__(self,frame):
+    def __init__(self,master,frame):
+        self.master=master
         self.oblik = IntVar()
         self.boja = IntVar()
         self.masa_min = IntVar()
@@ -44,6 +46,8 @@ class Spremnik:
         self.label_masa_max.grid(row=3, column=2, sticky=W)
         self.entry_masa_max = Entry(frame, width=5, state=DISABLED)
         self.entry_masa_max.grid(row=3, column=2, sticky=E)
+        self.entry_masa_min.bind("<Button-1>",self.Numpad_Show_Min)
+        self.entry_masa_max.bind("<Button-1>",self.Numpad_Show_Max)
         self._oblikState=False
         self._bojaState=False
         self._masaState=False
@@ -109,3 +113,12 @@ class Spremnik:
             self.label_masa_max.config(fg='grey')
             self.masa_min.set(0)
             self.masa_max.set(0)
+
+    def Numpad_Show_Min(self,arg):
+        print("You clicked on min masa entry")
+        new = NumPad(self.master, self, "min")
+
+    def Numpad_Show_Max(self,arg):
+        print("You clicked on max masa entry")
+        self.masa_max.set(0)
+        new = NumPad(self.master, self, "max")
