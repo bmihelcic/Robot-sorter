@@ -42,19 +42,18 @@ zeleni_br=[0,0,0]
 plavi_br=[0,0,0]
 zuti_br=[0,0,0]
 
+
 ''' main class, the whole application '''
-class App:
-    def __init__(self, root, window_title):
+class App(Frame):
+    def __init__(self, parent, **kwargs):
+        Frame.__init__(self,parent,**kwargs)
         self.message_list=['A',0,0,0,0,0,0,0,0,0,'B',0,0,0,0,0,0,0,0,0,'C',0,0,0,0,0,0,0,0,0,'#']
         ''' making some frames '''
-        self.root = root
-        self.root.title(window_title)
-        self.root.geometry('1024x600')
-        self.top_frame = Frame(root)
+        self.top_frame = Frame(parent)
         self.sub_frame_A = Frame(self.top_frame)
         self.sub_frame_B = Frame(self.top_frame)
         self.sub_frame_C = Frame(self.top_frame)
-        self.bottom_frame = Frame(root)
+        self.bottom_frame = Frame(parent)
 
         self.flag = 0
 
@@ -64,9 +63,9 @@ class App:
         self.label_A = Label(self.top_frame, text=DASH_COUNT * "-" + " Spremnik A " + DASH_COUNT * "-", bd=2, relief="solid", fg='white', bg='grey').grid(row=0,column=0)
         self.label_B = Label(self.top_frame, text=DASH_COUNT * '-' + " Spremnik B " + DASH_COUNT * "-", bd=2, relief="solid", fg='white', bg='grey').grid(row=0,column=1)
         self.label_C = Label(self.top_frame, text=DASH_COUNT * '-' + " Spremnik C " + DASH_COUNT * "-", bd=2, relief="solid", fg='white', bg='grey').grid(row=0,column=2)
-        self.spremnik_A = Spremnik(self.sub_frame_A)
-        self.spremnik_B = Spremnik(self.sub_frame_B)
-        self.spremnik_C = Spremnik(self.sub_frame_C)
+        self.spremnik_A = Spremnik(self,self.sub_frame_A)
+        self.spremnik_B = Spremnik(self,self.sub_frame_B)
+        self.spremnik_C = Spremnik(self,self.sub_frame_C)
         # Create a canvas that can fit the above video source size
         self.canvas = Canvas(self.bottom_frame, width=self.Video.width, height=self.Video.height)
         self.terminal = Text(self.bottom_frame, height=20, width=40)
@@ -83,19 +82,18 @@ class App:
         self.send_btn.grid(row=0, column=2, padx=50)
         self.canvas.grid(row=0, column=3)
         self.top_frame.pack()
-        Label(self.root, text=270 * '-').pack()
+        Label(parent, text=270 * '-').pack()
         self.bottom_frame.pack()
 
         self.delay = 4
         self.update()
-        self.root.mainloop()
 
     def update(self):
         self.frame = self.Video.Get_Frame()
         self._Detection()
         self.photo = ImageTk.PhotoImage(image=Image.fromarray(self.frame))
         self.canvas.create_image(0, 0, image=self.photo, anchor=NW)
-        self.root.after(self.delay, self.update)
+        self.after(self.delay, self.update)
 
     def Send(self):
         try:
@@ -119,8 +117,6 @@ class App:
                 if spremnik.toggle_btn_masa['text'] == 'ON':
                     if len(spremnik.entry_masa_min.get()) == 0 or len(spremnik.entry_masa_max.get()) == 0:
                         raise ValueError
-                    spremnik.masa_min.set(int(spremnik.entry_masa_min.get()))
-                    spremnik.masa_max.set(int(spremnik.entry_masa_max.get()))
                     if spremnik.masa_max.get() < spremnik.masa_min.get() or spremnik.masa_max.get() > 1000 or spremnik.masa_min.get() < 0:
                         raise ValueError
         ''' min masa '''
@@ -298,5 +294,9 @@ def Clear_Color_Counters():
         plavi_br[i] = 0
         zuti_br[i] = 0
 
- # Create a window and pass it to the Application object
-App(Tk(), "SORTER IZBORNIK")
+if __name__ == '__main__':
+    root = Tk()
+    root.geometry("1024x600")
+    app = App(root)
+    app.pack()
+    root.mainloop()
