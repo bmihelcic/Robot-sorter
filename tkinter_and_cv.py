@@ -50,10 +50,13 @@ class App(Frame):
         self.message_list=['A',0,0,0,0,0,0,0,0,0,'B',0,0,0,0,0,0,0,0,0,'C',0,0,0,0,0,0,0,0,0,'#']
         ''' making some frames '''
         self.top_frame = Frame(parent)
+        self.bottom_frame = Frame(parent)
         self.sub_frame_A = Frame(self.top_frame)
         self.sub_frame_B = Frame(self.top_frame)
         self.sub_frame_C = Frame(self.top_frame)
-        self.bottom_frame = Frame(parent)
+        self.sub_frame_D = Frame(self.bottom_frame)
+        self.sub_frame_E = Frame(self.bottom_frame)
+        self.sub_frame_F = Frame(self.bottom_frame)
 
         self.flag = 0
 
@@ -67,20 +70,25 @@ class App(Frame):
         self.spremnik_B = Spremnik(self,self.sub_frame_B)
         self.spremnik_C = Spremnik(self,self.sub_frame_C)
         # Create a canvas that can fit the above video source size
-        self.canvas = Canvas(self.bottom_frame, width=self.Video.width, height=self.Video.height)
-        self.terminal = Text(self.bottom_frame, height=20, width=40)
-        self.terminal_scrollbar = Scrollbar(self.bottom_frame, command=self.terminal.yview)
+        self.canvas = Canvas(self.sub_frame_F, width=self.Video.width, height=self.Video.height)
+        self.terminal = Text(self.sub_frame_D, height=20, width=40)
+        self.terminal_scrollbar = Scrollbar(self.sub_frame_D, command=self.terminal.yview)
         self.terminal.config(yscrollcommand=self.terminal_scrollbar.set)
-        self.send_btn = Button(self.bottom_frame, text="SEND", command=self.Send, width=8)
+        self.analyze_sort_btn = Button(self.sub_frame_E, height=3, text="ANALYZE", command=self.Analyze_Sort, width=8)
+        self.start_stop_btn = Button(self.sub_frame_E, height=3, text="START",bg = "light green", command=self.Start_Stop, width=8)
 
         ''' gridding and packing '''
         self.sub_frame_A.grid(row=1, column=0)
         self.sub_frame_B.grid(row=1, column=1)
         self.sub_frame_C.grid(row=1, column=2)
+        self.sub_frame_D.grid(row=0, column=0)
+        self.sub_frame_E.grid(row=0, column=1,padx=60)
+        self.sub_frame_F.grid(row=0, column=2)
         self.terminal.grid(row=0, column=0)
         self.terminal_scrollbar.grid(row=0, column=1, sticky='ns')
-        self.send_btn.grid(row=0, column=2, padx=50)
-        self.canvas.grid(row=0, column=3)
+        self.analyze_sort_btn.grid(row=0,column=0,pady=35)
+        self.start_stop_btn.grid(row=1, column=0)
+        self.canvas.grid(row=0, column=0)
         self.top_frame.pack()
         Label(parent, text=270 * '-').pack()
         self.bottom_frame.pack()
@@ -95,7 +103,13 @@ class App(Frame):
         self.canvas.create_image(0, 0, image=self.photo, anchor=NW)
         self.after(self.delay, self.update)
 
-    def Send(self):
+    def Start_Stop(self):
+        if self.start_stop_btn['text'] == "START":
+            self.start_stop_btn['text'] = "STOP"
+            self.start_stop_btn['bg'] = 'red'
+        elif self.start_stop_btn['text'] == "STOP":
+            self.start_stop_btn['text'] = "START"
+            self.start_stop_btn['bg'] = 'light green'
         try:
             self.Prepare_Message()
             self.message = ''.join(str(e) for e in self.message_list)
@@ -104,6 +118,12 @@ class App(Frame):
             # print(message)
         except ValueError:
             messagebox.showwarning("Warning!", "Molim ispravan unos mase (0-1000 grama)")
+
+    def Analyze_Sort(self):
+        if self.analyze_sort_btn['text'] == "ANALYZE":
+            self.analyze_sort_btn['text'] = "SORT"
+        elif self.analyze_sort_btn['text'] == "SORT":
+            self.analyze_sort_btn['text'] = "ANALYZE"
 
     def Prepare_Message(self):
         self.spremnici = [self.spremnik_A,self.spremnik_B,self.spremnik_C]
