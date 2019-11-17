@@ -9,8 +9,8 @@ TOG_WIDTH=8
 
 ''' klasa za spremnike, toggle buttons, radio buttons, etc. '''
 class Spremnik:
-    def __init__(self,master,frame):
-        self.master=master
+    def __init__(self,root,frame):
+        self.root=root
         self.oblik = IntVar()
         self.boja = IntVar()
         self.masa_min = IntVar()
@@ -115,10 +115,10 @@ class Spremnik:
             self.masa_max.set(0)
 
     def Numpad_Show_Min(self,arg):
-        print("You clicked on min masa entry")
-        new = NumPad(self.master, self, "min")
+        if self._masaState == True:
+            new = NumPad(self.root, self, "min")
 
     def Numpad_Show_Max(self,arg):
-        print("You clicked on max masa entry")
-        self.masa_max.set(0)
-        new = NumPad(self.master, self, "max")
+        if self._masaState == True:
+            self.masa_max.set(0)
+            new = NumPad(self.root, self, "max")
