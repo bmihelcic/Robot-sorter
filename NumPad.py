@@ -9,6 +9,8 @@ class NumPad(simpledialog.Dialog):
         self.top = Toplevel(master=master_frame)
         self.top.protocol("WM_DELETE_WINDOW",self.OK)
         self.createWidgets()
+        self.top.wait_visibility()
+        self.top.grab_set()
 
     def createWidgets(self):
         btn_list = ['7',  '8',  '9', '4',  '5',  '6', '1',  '2',  '3', 'Del',  '0',  'OK']

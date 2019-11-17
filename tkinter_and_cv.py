@@ -45,15 +45,15 @@ zuti_br=[0,0,0]
 
 ''' main class, the whole application '''
 class App(Frame):
-    def __init__(self, parent, **kwargs):
-        Frame.__init__(self,parent,**kwargs)
+    def __init__(self, root, **kwargs):
+        Frame.__init__(self,root,**kwargs)
         self.message_list=['A',0,0,0,0,0,0,0,0,0,'B',0,0,0,0,0,0,0,0,0,'C',0,0,0,0,0,0,0,0,0,'#']
         ''' making some frames '''
-        self.top_frame = Frame(parent)
+        self.top_frame = Frame(root)
         self.sub_frame_A = Frame(self.top_frame)
         self.sub_frame_B = Frame(self.top_frame)
         self.sub_frame_C = Frame(self.top_frame)
-        self.bottom_frame = Frame(parent)
+        self.bottom_frame = Frame(root)
 
         self.flag = 0
 
@@ -63,9 +63,9 @@ class App(Frame):
         self.label_A = Label(self.top_frame, text=DASH_COUNT * "-" + " Spremnik A " + DASH_COUNT * "-", bd=2, relief="solid", fg='white', bg='grey').grid(row=0,column=0)
         self.label_B = Label(self.top_frame, text=DASH_COUNT * '-' + " Spremnik B " + DASH_COUNT * "-", bd=2, relief="solid", fg='white', bg='grey').grid(row=0,column=1)
         self.label_C = Label(self.top_frame, text=DASH_COUNT * '-' + " Spremnik C " + DASH_COUNT * "-", bd=2, relief="solid", fg='white', bg='grey').grid(row=0,column=2)
-        self.spremnik_A = Spremnik(self,self.sub_frame_A)
-        self.spremnik_B = Spremnik(self,self.sub_frame_B)
-        self.spremnik_C = Spremnik(self,self.sub_frame_C)
+        self.spremnik_A = Spremnik(root,self.sub_frame_A)
+        self.spremnik_B = Spremnik(root,self.sub_frame_B)
+        self.spremnik_C = Spremnik(root,self.sub_frame_C)
         # Create a canvas that can fit the above video source size
         self.canvas = Canvas(self.bottom_frame, width=self.Video.width, height=self.Video.height)
         self.terminal = Text(self.bottom_frame, height=20, width=40)
@@ -82,7 +82,7 @@ class App(Frame):
         self.send_btn.grid(row=0, column=2, padx=50)
         self.canvas.grid(row=0, column=3)
         self.top_frame.pack()
-        Label(parent, text=270 * '-').pack()
+        Label(root, text=270 * '-').pack()
         self.bottom_frame.pack()
 
         self.delay = 4
