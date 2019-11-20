@@ -6,7 +6,8 @@ class NumPad(simpledialog.Dialog):
         self.root=root
         self.masa = masa
         self.parent=parent
-        self.top = Toplevel(master=root)
+        self.top = Toplevel(master=parent.frame)
+        self.top.title(masa)
         self.top.protocol("WM_DELETE_WINDOW", self.OK)
 
         self.EntryFrame = Frame(self.top)
@@ -16,7 +17,8 @@ class NumPad(simpledialog.Dialog):
         self.top.grab_set()
 
     def createWidgets(self):
-        self.text = Text(self.EntryFrame,height=1,width=22,font=("Helvetica", 20)).pack(pady=10)
+        self.entry = Entry(self.EntryFrame,font=("Helvetica",32),width=5,justify=CENTER)
+        self.entry.pack(pady=10)
         btn_list = ['7',  '8',  '9', '4',  '5',  '6', '1',  '2',  '3', 'Del',  '0',  'OK']
         # create and position all buttons with a for-loop
         # r, c used for row, column grid values
@@ -46,27 +48,36 @@ class NumPad(simpledialog.Dialog):
                 currentText = str(self.parent.masa_min.get())
                 self.parent.masa_min.set(currentText[:-1])
                 self.parent.entry_masa_min.delete(0, END)
+                self.entry.delete(0,END)
                 self.parent.entry_masa_min.insert(0, self.parent.masa_min.get())
+                self.entry.insert(0,self.parent.masa_min.get())
             elif label == 'OK':
                 self.OK()
             else:
                 currentText = str(self.parent.masa_min.get())
                 self.parent.entry_masa_min.delete(0,END)
+                self.entry.delete(0, END)
                 self.parent.masa_min.set(int(currentText+label))
                 self.parent.entry_masa_min.insert(0, self.parent.masa_min.get())
+                self.entry.insert(0,self.parent.masa_min.get())
+
         elif self.masa == "max":
             if label == 'Del':
                 currentText = str(self.parent.masa_max.get())
                 self.parent.masa_max.set(currentText[:-1])
                 self.parent.entry_masa_max.delete(0, END)
+                self.entry.delete(0, END)
                 self.parent.entry_masa_max.insert(0, self.parent.masa_max.get())
+                self.entry.insert(0, self.parent.masa_max.get())
             elif label == 'OK':
                 self.OK()
             else:
                 currentText = str(self.parent.masa_max.get())
                 self.parent.entry_masa_max.delete(0,END)
+                self.entry.delete(0, END)
                 self.parent.masa_max.set(int(currentText+label))
                 self.parent.entry_masa_max.insert(0, self.parent.masa_max.get())
+                self.entry.insert(0, self.parent.masa_max.get())
 
     def OK(self):
         self.top.destroy()

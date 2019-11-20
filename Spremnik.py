@@ -11,6 +11,7 @@ TOG_WIDTH=8
 class Spremnik:
     def __init__(self,root,frame):
         self.root=root
+        self.frame=frame
         self.oblik = IntVar()
         self.boja = IntVar()
         self.masa_min = IntVar()

@@ -1,3 +1,4 @@
 python_programms/
 venv/
 .idea
+__pycache__/

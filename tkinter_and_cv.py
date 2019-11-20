@@ -297,6 +297,7 @@ def Clear_Color_Counters():
 if __name__ == '__main__':
     root = Tk()
     root.geometry("1024x600")
+    root.title("SORTER IZBORNIK")
     app = App(root)
     app.pack()
     root.mainloop()
