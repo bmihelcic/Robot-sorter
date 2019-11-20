@@ -13,6 +13,8 @@ from Spremnik import Spremnik
 from VideoCapture import VideoCapture
 import cv2
 import numpy as np
+import RPi.GPIO as GPIO
+import serial
 
 DASH_COUNT=25
 # koliko puta mora neki objekt biti prepoznat prije slanja informacije...povecanje pouzdanosti
@@ -41,6 +43,15 @@ crveni_br=[0,0,0]
 zeleni_br=[0,0,0]
 plavi_br=[0,0,0]
 zuti_br=[0,0,0]
+
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(17,GPIO.IN)
+
+UART=serial.Serial()
+UART.baudrate=115200
+UART.port='/dev/serial0'
+UART.open()
 
 
 ''' main class, the whole application '''
@@ -200,7 +211,7 @@ class App(Frame):
                             crveni_br[0] += 1
                             if crveni_br[0] >= MIN_DETECT:
                                 Clear_Color_Counters()
-                                #UART.write(b'23#')
+                                UART.write(b'23#')
                                 self.terminal.insert(END, str(self.predmet_num)+'. predmet: Crvena piramida\n')
                                 self.terminal.see('end')
                                 self.predmet_num+=1
@@ -210,7 +221,7 @@ class App(Frame):
                             crveni_br[1] += 1
                             if crveni_br[1] >= MIN_DETECT:
                                 Clear_Color_Counters()
-                               # UART.write(b'22#')
+                                UART.write(b'22#')
                                 self.terminal.insert(END,str(self.predmet_num)+'. predmet: Crvena kocka\n')
                                 self.terminal.see('end')
                                 self.predmet_num += 1
@@ -220,7 +231,7 @@ class App(Frame):
                             crveni_br[2] += 1
                             if crveni_br[2] >= MIN_DETECT:
                                 Clear_Color_Counters()
-                                #UART.write(b'21#')
+                                UART.write(b'21#')
                                 self.terminal.insert(END, str(self.predmet_num)+'. predmet: Crvena kugla\n')
                                 self.terminal.see('end')
                                 self.predmet_num += 1
@@ -234,7 +245,7 @@ class App(Frame):
                             zeleni_br[0]+=1
                             if zeleni_br[0] >= MIN_DETECT:
                                 Clear_Color_Counters()
-                                #UART.write(b'13#')
+                                UART.write(b'13#')
                                 self.terminal.insert(END, str(self.predmet_num)+'. predmet: Zelena piramida\n')
                                 self.terminal.see('end')
                                 self.predmet_num += 1
@@ -244,7 +255,7 @@ class App(Frame):
                             zeleni_br[1]+=1
                             if zeleni_br[1] >= MIN_DETECT:
                                 Clear_Color_Counters()
-                                #UART.write(b'12#')
+                                UART.write(b'12#')
                                 self.terminal.insert(END, str(self.predmet_num)+'. predmet: Zelena kocka\n')
                                 self.terminal.see('end')
                                 self.predmet_num += 1
@@ -254,7 +265,7 @@ class App(Frame):
                             zeleni_br[2]+=1
                             if zeleni_br[2] >= MIN_DETECT:
                                 Clear_Color_Counters()
-                                #UART.write(b'11#')
+                                UART.write(b'11#')
                                 self.terminal.insert(END, str(self.predmet_num)+'. predmet: Zelena kugla\n')
                                 self.terminal.see('end')
                                 self.predmet_num += 1
@@ -268,7 +279,7 @@ class App(Frame):
                             plavi_br[0]+=1
                             if plavi_br[0] >= MIN_DETECT:
                                 Clear_Color_Counters()
-                                #UART.write(b'33#')
+                                UART.write(b'33#')
                                 self.terminal.insert(END, str(self.predmet_num)+'. predmet: Plava piramida\n')
                                 self.terminal.see('end')
                                 self.predmet_num += 1
@@ -278,7 +289,7 @@ class App(Frame):
                             plavi_br[1]+=1
                             if plavi_br[1] >= MIN_DETECT:
                                 Clear_Color_Counters()
-                                #UART.write(b'32#')
+                                UART.write(b'32#')
                                 self.terminal.insert(END, str(self.predmet_num)+'. predmet: Plava kocka\n')
                                 self.terminal.see('end')
                                 self.predmet_num += 1
@@ -288,7 +299,7 @@ class App(Frame):
                             plavi_br[2]+=1
                             if plavi_br[2] >= MIN_DETECT:
                                 Clear_Color_Counters()
-                                #UART.write(b'31#')
+                                UART.write(b'31#')
                                 self.terminal.insert(END, str(self.predmet_num)+'. predmet: Plava kugla\n')
                                 self.terminal.see('end')
                                 self.predmet_num += 1
@@ -302,7 +313,7 @@ class App(Frame):
                             zuti_br[0]+=1
                             if zuti_br[0] >= MIN_DETECT:
                                 Clear_Color_Counters()
-                                #UART.write(b'43#')
+                                UART.write(b'43#')
                                 self.terminal.insert(END, str(self.predmet_num)+'. predmet: Zuta piramida\n')
                                 self.terminal.see('end')
                                 self.predmet_num += 1
@@ -312,7 +323,7 @@ class App(Frame):
                             zuti_br[1]+=1
                             if zuti_br[1] >= MIN_DETECT:
                                 Clear_Color_Counters()
-                                #UART.write(b'42#')
+                                UART.write(b'42#')
                                 self.terminal.insert(END, str(self.predmet_num)+'. predmet: Zuta kocka\n')
                                 self.terminal.see('end')
                                 self.predmet_num += 1
@@ -322,7 +333,7 @@ class App(Frame):
                             zuti_br[2]+=1
                             if zuti_br[2] >= MIN_DETECT:
                                 Clear_Color_Counters()
-                                #UART.write(b'41#')
+                                UART.write(b'41#')
                                 self.terminal.insert(END, str(self.predmet_num)+'. predmet: Zuta kugla\n')
                                 self.terminal.see('end')
                                 self.predmet_num += 1
