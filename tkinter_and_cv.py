@@ -78,9 +78,9 @@ class App(Frame):
         self.label_A = Label(self.top_frame, text=DASH_COUNT * "-" + " Spremnik A " + DASH_COUNT * "-", bd=2, relief="solid", fg='white', bg='grey').grid(row=0,column=0)
         self.label_B = Label(self.top_frame, text=DASH_COUNT * '-' + " Spremnik B " + DASH_COUNT * "-", bd=2, relief="solid", fg='white', bg='grey').grid(row=0,column=1)
         self.label_C = Label(self.top_frame, text=DASH_COUNT * '-' + " Spremnik C " + DASH_COUNT * "-", bd=2, relief="solid", fg='white', bg='grey').grid(row=0,column=2)
-        self.spremnik_A = Spremnik(self,self.sub_frame_A)
-        self.spremnik_B = Spremnik(self,self.sub_frame_B)
-        self.spremnik_C = Spremnik(self,self.sub_frame_C)
+        self.spremnik_A = Spremnik(root,self.sub_frame_A)
+        self.spremnik_B = Spremnik(root,self.sub_frame_B)
+        self.spremnik_C = Spremnik(root,self.sub_frame_C)
         # Create a canvas that can fit the above video source size
         self.canvas = Canvas(self.sub_frame_F, width=self.Video.width, height=self.Video.height)
         self.terminal = Text(self.sub_frame_D, height=20, width=40)
@@ -102,7 +102,7 @@ class App(Frame):
         self.start_stop_btn.grid(row=1, column=0)
         self.canvas.grid(row=0, column=0)
         self.top_frame.pack()
-        Label(parent, text=270 * '-').pack()
+        Label(root, text=270 * '-').pack()
         self.bottom_frame.pack()
 
         self.delay = 4
@@ -350,6 +350,7 @@ def Clear_Color_Counters():
 if __name__ == '__main__':
     root = Tk()
     root.geometry("1024x600")
+    root.title("SORTER IZBORNIK")
     app = App(root)
     app.pack()
     root.mainloop()
