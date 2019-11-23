@@ -13,6 +13,7 @@ from Spremnik import Spremnik
 from VideoCapture import VideoCapture
 import cv2
 import numpy as np
+import threading
 
 DASH_COUNT=25
 # koliko puta mora neki objekt biti prepoznat prije slanja informacije...povecanje pouzdanosti
@@ -41,6 +42,157 @@ crveni_br=[0,0,0]
 zeleni_br=[0,0,0]
 plavi_br=[0,0,0]
 zuti_br=[0,0,0]
+
+class DetectionThread(threading.Thread):
+    def __init__(self, parent):
+        threading.Thread.__init__(self)
+        self.parent = parent
+
+    def run(self):
+        while True:
+            self.frame = self.parent.Video.Get_Frame()
+            self.hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
+            n = 0
+            for i, j in colors:
+                mask[n] = cv2.inRange(self.hsv, i, j)
+                median[n] = cv2.medianBlur(mask[n], 9)
+                n += 1
+            for n in range(0, COLORS_NUM):
+                contours, _ = cv2.findContours(median[n], cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+                for cnt in contours:
+                    area = cv2.contourArea(cnt)
+                    # print('area='+str(area))
+                    approx = cv2.approxPolyDP(cnt, 0.03 * cv2.arcLength(cnt, True), True)
+                    x = approx.ravel()[0]
+                    y = approx.ravel()[1]
+
+                    # crvenu boju
+                    if n == 0:
+                        if area > POVRSINA:
+                            cv2.drawContours(self.frame, [approx], -1, (0, 0, 255), 3)
+                            if len(approx) == 3:
+                                cv2.putText(self.frame, 'Crvena piramida', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255))
+                                crveni_br[0] += 1
+                                if crveni_br[0] >= MIN_DETECT:
+                                    Clear_Color_Counters()
+                                    #UART.write(b'23#')
+                                    self.parent.terminal.insert(END, 'Crvena piramida\n')
+                                    self.parent.terminal.see('end')
+                                    self.parent.flag = 0
+                            elif len(approx) == 4:
+                                cv2.putText(self.frame, 'Crvena kocka', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255))
+                                crveni_br[1] += 1
+                                if crveni_br[1] >= MIN_DETECT:
+                                    Clear_Color_Counters()
+                                   # UART.write(b'22#')
+                                    self.parent.terminal.insert(END,'Crvena kocka\n')
+                                    self.parent.terminal.see('end')
+                                    self.parent.flag = 0
+                            elif len(approx) >= 7:
+                                cv2.putText(self.frame, 'Crvena kugla', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255))
+                                crveni_br[2] += 1
+                                if crveni_br[2] >= MIN_DETECT:
+                                    Clear_Color_Counters()
+                                    #UART.write(b'21#')
+                                    self.parent.terminal.insert(END, 'Crvena kugla\n')
+                                    self.parent.terminal.see('end')
+                                    self.parent.flag = 0
+                    # zelena boja
+                    elif n==1:
+                        if area > POVRSINA:
+                            cv2.drawContours(self.frame, [approx], -1, (0, 255, 0), 3)
+                            if len(approx) == 3:
+                                cv2.putText(self.frame, 'Zelena piramida', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0))
+                                zeleni_br[0]+=1
+                                if zeleni_br[0] >= MIN_DETECT:
+                                    Clear_Color_Counters()
+                                    #UART.write(b'13#')
+                                    self.parent.terminal.insert(END, 'Zelena piramida\n')
+                                    self.parent.terminal.see('end')
+                                    self.parent.flag=0
+                            elif len(approx) == 4:
+                                cv2.putText(self.frame, 'Zelena kocka', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0))
+                                zeleni_br[1]+=1
+                                if zeleni_br[1] >= MIN_DETECT:
+                                    Clear_Color_Counters()
+                                    #UART.write(b'12#')
+                                    self.parent.terminal.insert(END, 'Zelena kocka\n')
+                                    self.parent.terminal.see('end')
+                                    self.parent.flag=0
+                            elif len(approx) >= 7:
+                                cv2.putText(self.frame, 'Zelena kugla', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0))
+                                zeleni_br[2]+=1
+                                if zeleni_br[2] >= MIN_DETECT:
+                                    Clear_Color_Counters()
+                                    #UART.write(b'11#')
+                                    self.parent.terminal.insert(END, 'Zelena kugla\n')
+                                    self.parent.terminal.see('end')
+                                    self.parent.flag=0
+                    # plava boja
+                    elif n==2:
+                        if area > POVRSINA:
+                            cv2.drawContours(self.frame, [approx], -1, (255, 0, 0), 3)
+                            if len(approx) == 3:
+                                cv2.putText(self.frame, 'Plava piramida', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (255,0,0))
+                                plavi_br[0]+=1
+                                if plavi_br[0] >= MIN_DETECT:
+                                    Clear_Color_Counters()
+                                    #UART.write(b'33#')
+                                    self.parent.terminal.insert(END, 'Plava piramida\n')
+                                    self.parent.terminal.see('end')
+                                    self.parent.flag=0
+                            elif len(approx) == 4:
+                                cv2.putText(self.frame, 'Plava kocka', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (255,0,0))
+                                plavi_br[1]+=1
+                                if plavi_br[1] >= MIN_DETECT:
+                                    Clear_Color_Counters()
+                                    #UART.write(b'32#')
+                                    self.parent.terminal.insert(END, 'Plava kocka\n')
+                                    self.parent.terminal.see('end')
+                                    self.parent.flag=0
+                            elif len(approx) >= 7:
+                                cv2.putText(self.frame, 'Plava kugla', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (255,0,0))
+                                plavi_br[2]+=1
+                                if plavi_br[2] >= MIN_DETECT:
+                                    Clear_Color_Counters()
+                                    #UART.write(b'31#')
+                                    self.parent.terminal.insert(END, 'Plava kugla\n')
+                                    self.parent.terminal.see('end')
+                                    self.parent.flag=0
+                    # zuta boja
+                    elif n==3:
+                        if area > POVRSINA:
+                            cv2.drawContours(self.frame, [approx], -1, (255, 255, 0), 3)
+                            if len(approx) == 3:
+                                cv2.putText(self.frame, 'Zuta piramida', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,0))
+                                zuti_br[0]+=1
+                                if zuti_br[0] >= MIN_DETECT:
+                                    Clear_Color_Counters()
+                                    #UART.write(b'43#')
+                                    self.parent.terminal.insert(END, 'Zuta piramida\n')
+                                    self.parent.terminal.see('end')
+                                    self.parent.flag=0
+                            elif len(approx) == 4:
+                                cv2.putText(self.frame, 'Zuta kocka', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,0))
+                                zuti_br[1]+=1
+                                if zuti_br[1] >= MIN_DETECT:
+                                    Clear_Color_Counters()
+                                    #UART.write(b'42#')
+                                    self.parent.terminal.insert(END, 'Zuta kocka\n')
+                                    self.parent.terminal.see('end')
+                                    self.parent.flag=0
+                            elif len(approx) >= 7:
+                                cv2.putText(self.frame, 'Zuta kugla', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,0))
+                                zuti_br[2]+=1
+                                if zuti_br[2] >= MIN_DETECT:
+                                    Clear_Color_Counters()
+                                    #UART.write(b'41#')
+                                    self.parent.terminal.insert(END, 'Zuta kugla\n')
+                                    self.parent.terminal.see('end')
+                                    self.parent.flag=0
+            self.photo = ImageTk.PhotoImage(image=Image.fromarray(self.frame))
+            self.parent.canvas.create_image(0, 0, image=self.photo, anchor=NW)
+
 
 
 ''' main class, the whole application '''
@@ -85,15 +237,16 @@ class App(Frame):
         Label(root, text=270 * '-').pack()
         self.bottom_frame.pack()
 
-        self.delay = 10
         self.update()
+        t2 = DetectionThread(self)
+        t2.start()
 
     def update(self):
-        self.frame = self.Video.Get_Frame()
-        self._Detection()
-        self.photo = ImageTk.PhotoImage(image=Image.fromarray(self.frame))
-        self.canvas.create_image(0, 0, image=self.photo, anchor=NW)
-        self.after(self.delay, self.update)
+        #self.frame = self.Video.Get_Frame()
+        #self._Detection()
+        #self.photo = ImageTk.PhotoImage(image=Image.fromarray(self.frame))
+        #self.canvas.create_image(0, 0, image=self.photo, anchor=NW)
+        self.after(5, self.update)
 
     def Send(self):
         try:
@@ -144,148 +297,6 @@ class App(Frame):
             self.message_list[7 + c * 10] = temp[1]
             self.message_list[8 + c * 10] = temp[2]
             self.message_list[9 + c * 10] = temp[3]
-
-    def _Detection(self):
-        self.hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
-        n = 0
-        for i, j in colors:
-            mask[n] = cv2.inRange(self.hsv, i, j)
-            median[n] = cv2.medianBlur(mask[n], 9)
-            n += 1
-        for n in range(0, COLORS_NUM):
-            contours, _ = cv2.findContours(median[n], cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            for cnt in contours:
-                area = cv2.contourArea(cnt)
-                # print('area='+str(area))
-                approx = cv2.approxPolyDP(cnt, 0.03 * cv2.arcLength(cnt, True), True)
-                x = approx.ravel()[0]
-                y = approx.ravel()[1]
-
-                # crvenu boju
-                if n == 0:
-                    if area > POVRSINA:
-                        cv2.drawContours(self.frame, [approx], -1, (0, 0, 255), 3)
-                        if len(approx) == 3:
-                            cv2.putText(self.frame, 'Crvena piramida', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255))
-                            crveni_br[0] += 1
-                            if crveni_br[0] >= MIN_DETECT:
-                                Clear_Color_Counters()
-                                #UART.write(b'23#')
-                                self.terminal.insert(END, 'Crvena piramida\n')
-                                self.terminal.see('end')
-                                self.flag = 0
-                        elif len(approx) == 4:
-                            cv2.putText(self.frame, 'Crvena kocka', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255))
-                            crveni_br[1] += 1
-                            if crveni_br[1] >= MIN_DETECT:
-                                Clear_Color_Counters()
-                               # UART.write(b'22#')
-                                self.terminal.insert(END,'Crvena kocka\n')
-                                self.terminal.see('end')
-                                self.flag = 0
-                        elif len(approx) >= 7:
-                            cv2.putText(self.frame, 'Crvena kugla', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255))
-                            crveni_br[2] += 1
-                            if crveni_br[2] >= MIN_DETECT:
-                                Clear_Color_Counters()
-                                #UART.write(b'21#')
-                                self.terminal.insert(END, 'Crvena kugla\n')
-                                self.terminal.see('end')
-                                self.flag = 0
-                # zelena boja
-                elif n==1:
-                    if area > POVRSINA:
-                        cv2.drawContours(self.frame, [approx], -1, (0, 255, 0), 3)
-                        if len(approx) == 3:
-                            cv2.putText(self.frame, 'Zelena piramida', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0))
-                            zeleni_br[0]+=1
-                            if zeleni_br[0] >= MIN_DETECT:
-                                Clear_Color_Counters()
-                                #UART.write(b'13#')
-                                self.terminal.insert(END, 'Zelena piramida\n')
-                                self.terminal.see('end')
-                                self.flag=0
-                        elif len(approx) == 4:
-                            cv2.putText(self.frame, 'Zelena kocka', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0))
-                            zeleni_br[1]+=1
-                            if zeleni_br[1] >= MIN_DETECT:
-                                Clear_Color_Counters()
-                                #UART.write(b'12#')
-                                self.terminal.insert(END, 'Zelena kocka\n')
-                                self.terminal.see('end')
-                                self.flag=0
-                        elif len(approx) >= 7:
-                            cv2.putText(self.frame, 'Zelena kugla', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0))
-                            zeleni_br[2]+=1
-                            if zeleni_br[2] >= MIN_DETECT:
-                                Clear_Color_Counters()
-                                #UART.write(b'11#')
-                                self.terminal.insert(END, 'Zelena kugla\n')
-                                self.terminal.see('end')
-                                self.flag=0
-                # plava boja
-                elif n==2:
-                    if area > POVRSINA:
-                        cv2.drawContours(self.frame, [approx], -1, (255, 0, 0), 3)
-                        if len(approx) == 3:
-                            cv2.putText(self.frame, 'Plava piramida', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (255,0,0))
-                            plavi_br[0]+=1
-                            if plavi_br[0] >= MIN_DETECT:
-                                Clear_Color_Counters()
-                                #UART.write(b'33#')
-                                self.terminal.insert(END, 'Plava piramida\n')
-                                self.terminal.see('end')
-                                self.flag=0
-                        elif len(approx) == 4:
-                            cv2.putText(self.frame, 'Plava kocka', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (255,0,0))
-                            plavi_br[1]+=1
-                            if plavi_br[1] >= MIN_DETECT:
-                                Clear_Color_Counters()
-                                #UART.write(b'32#')
-                                self.terminal.insert(END, 'Plava kocka\n')
-                                self.terminal.see('end')
-                                self.flag=0
-                        elif len(approx) >= 7:
-                            cv2.putText(self.frame, 'Plava kugla', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (255,0,0))
-                            plavi_br[2]+=1
-                            if plavi_br[2] >= MIN_DETECT:
-                                Clear_Color_Counters()
-                                #UART.write(b'31#')
-                                self.terminal.insert(END, 'Plava kugla\n')
-                                self.terminal.see('end')
-                                self.flag=0
-                # zuta boja
-                elif n==3:
-                    if area > POVRSINA:
-                        cv2.drawContours(self.frame, [approx], -1, (255, 255, 0), 3)
-                        if len(approx) == 3:
-                            cv2.putText(self.frame, 'Zuta piramida', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,0))
-                            zuti_br[0]+=1
-                            if zuti_br[0] >= MIN_DETECT:
-                                Clear_Color_Counters()
-                                #UART.write(b'43#')
-                                self.terminal.insert(END, 'Zuta piramida\n')
-                                self.terminal.see('end')
-                                self.flag=0
-                        elif len(approx) == 4:
-                            cv2.putText(self.frame, 'Zuta kocka', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,0))
-                            zuti_br[1]+=1
-                            if zuti_br[1] >= MIN_DETECT:
-                                Clear_Color_Counters()
-                                #UART.write(b'42#')
-                                self.terminal.insert(END, 'Zuta kocka\n')
-                                self.terminal.see('end')
-                                self.flag=0
-                        elif len(approx) >= 7:
-                            cv2.putText(self.frame, 'Zuta kugla', (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,0))
-                            zuti_br[2]+=1
-                            if zuti_br[2] >= MIN_DETECT:
-                                Clear_Color_Counters()
-                                #UART.write(b'41#')
-                                self.terminal.insert(END, 'Zuta kugla\n')
-                                self.terminal.see('end')
-                                self.flag=0
-
 
 def Clear_Color_Counters():
     for i in range(0, 3):
