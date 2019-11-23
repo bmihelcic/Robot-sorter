@@ -85,7 +85,7 @@ class App(Frame):
         Label(root, text=270 * '-').pack()
         self.bottom_frame.pack()
 
-        self.delay = 4
+        self.delay = 10
         self.update()
 
     def update(self):
