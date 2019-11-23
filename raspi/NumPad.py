@@ -13,10 +13,6 @@ class NumPad(simpledialog.Dialog):
         self.EntryFrame = Frame(self.top)
         self.BtnsFrame = Frame(self.top)
         self.createWidgets()
-        size = tuple(int(_) for _ in self.top.geometry().split('+')[0].split('x'))
-        self.x = 1024 / 2 - size[0] / 2
-        self.y = 600 / 2 - size[1] / 2
-        self.top.geometry("+%d+%d" % (self.x, self.y))
         self.top.wait_visibility()
         self.top.grab_set()
 
