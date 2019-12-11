@@ -16,6 +16,7 @@ import cv2
 import numpy as np
 import RPi.GPIO as GPIO
 import serial
+import threading
 
 DASH_COUNT=25
 # koliko puta mora neki objekt biti prepoznat prije slanja informacije...povecanje pouzdanosti
@@ -54,6 +55,12 @@ UART.baudrate=115200
 UART.port='/dev/serial0'
 UART.open()
 
+rec_masa=""
+
+def UART_Thread():
+    global rec_masa
+    if not rec_masa:
+        rec_masa=UART.read(5)
 
 ''' main class, the whole application '''
 class App(Frame):
@@ -72,6 +79,8 @@ class App(Frame):
 
         self.predmet_num=1
         self.flag = 0
+
+        ut=threading.Thread(target=UART_Thread)
 
         # open video source
         self.Video = VideoCapture(0)
@@ -107,13 +116,15 @@ class App(Frame):
         self.bottom_frame.pack()
 
         self.delay = 4
+        ut.start()
         self.update()
 
     def update(self):
         self.frame = self.Video.Get_Frame()
         if GPIO.input(17) == GPIO.HIGH:
             self.flag=True
-        print(self.flag)
+            self.terminal.insert(END, rec_masa + '\n')
+        #print(self.flag)
         if self.flag == True:
             self._Detection()
         self.photo = ImageTk.PhotoImage(image=Image.fromarray(self.frame))
