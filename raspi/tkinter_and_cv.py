@@ -59,8 +59,9 @@ rec_masa=""
 
 def UART_Thread():
     global rec_masa
-    if not rec_masa:
-        rec_masa=UART.read(5)
+    while True:
+        if not rec_masa:
+            rec_masa=UART.read(5)
 
 ''' main class, the whole application '''
 class App(Frame):
@@ -80,7 +81,7 @@ class App(Frame):
         self.predmet_num=1
         self.flag = 0
 
-        ut=threading.Thread(target=UART_Thread)
+        th=threading.Thread(target=UART_Thread)
 
         # open video source
         self.Video = VideoCapture(0)
@@ -116,7 +117,7 @@ class App(Frame):
         self.bottom_frame.pack()
 
         self.delay = 4
-        ut.start()
+        th.start()
         self.update()
 
     def update(self):
